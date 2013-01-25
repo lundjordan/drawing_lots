@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+
+	<meta charset="utf-8">
+	<title>Drawing lots</title>
+
+	<link rel="stylesheet" href="main.css" type="text/css" media="screen" />
+	<style type="text/css">
+  #container {width: 900px;}
+  </style>
+</head>
+<body>
+<div id="container">
+  <h2>Instructions</h2>
+  <p>The application is a simple one-page application to draw lots. For example, if a limited number of tickets for an event were available, the organisers might decide to allocate the tickets by drawing lots. The initial screen should look like this:</p>
+  <p align="center"><img src="screenshots/screen1.png"></p>
+  <p>As you enter names and click Add (or just press Enter), the page will eventually look like:</p>
+  <p align="center"><img src="screenshots/screen2.png"></p>
+  <p>Eventually, you click on the Draw Winner button and you see:</p>
+  <p align="center"><img src="screenshots/screen3.png"></p>
+  <p>Several winners can be drawn and previous winners remain:</p>
+  <p align="center"><img src="screenshots/screen4.png"></p>
+  <p>The basic structure of the required HTML is shown in the <code>sample.html</code> file. Note that this is just a static HTML mock-up. There is no functionality in that page. The starting point for your project is the <code>index.html</code> file, which just contains an empty container div.</p>
+  <h2>Stage 1</h2>
+  <p>Create a one-page Backbone.js application to draw lots. You will need an <code>Entrant</code> model which has a <code>name</code> attribute and a boolean <code>winner</code> attribute (to record whether or not the entrant is a winner). You will need an associated collection (<code>EntrantList</code>) and views for the individual model and the collection (<code>EntrantView</code> and <code>EntrantListView</code>). Set up the initial application so that the root route loads <code>EntrantListView</code> into the container div. (Note: <code>EntrantListView</code> contains the form and the Draw Winner button.) On completion of stage 1, your page should look like the first screenshot above.</p>
+  <h2>Stage 2</h2>
+  <p>Add entrants to the collection. The simplest way to do this is to the submit event of the form in the <code>EntrantListView</code>. Starting code for this would look like:</p>
+  <pre><code>
+    events: {
+      'submit #new_entry': 'createEntry'
+    },
+    
+    createEntry: function(event) {
+      event.preventDefault();
+      console.log('Form submitted');
+    }
+  </code></pre>
+  <p>(Note: the <code>event.preventDefault();</code> is just to stop the form being submitted and generating a page refresh.)</p>
+  <h2>Stage 3</h2>
+  <p>Implement the Draw Winner functionality. The simplest way to implement this is to avail of the <code>shuffle()</code> method that comes with Underscore. You can shuffle either an array or a Backbone collection and then take the winner as the first entrant in the shuffled collection (<em>i.e.</em> at index 0). Set the boolean attribute of the model and have the DOM update by registering a change handler.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+
+    <meta charset="utf-8">
+    <title>Drawing lots</title>
+
+    <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
+    <script type="text/template" id="drawing-lots-template">
+      <h1>Drawing lots</h1>
+      <form id="new-entry">
+        <input type="text" name="name" id="new-entry-name">
+        <input type="submit" value="Add">
+      </form>
+      <ul id="entries">
+      </ul>
+      <button id="draw">Draw Winner</button>
+    </script>
+
+    <script type="text/template" id="entrant-template">
+      <div>
+        <label><%= name %></label>
+      </div>
+    </script>
+
+    <script src="javascripts/vendor/json2.js"></script>
+    <script src="javascripts/vendor/jquery.js"></script>
+    <script src="javascripts/vendor/underscore.js"></script>
+    <script src="javascripts/vendor/backbone.js"></script>
+    <script src="javascripts/vendor/backbone.localStorage.js"></script>
+    <script src="javascripts/application.js"></script>
+
+  </head>
+  <body>
+    <div id="container"> </div>
+  </body>
+</html>
