@@ -1,4 +1,3 @@
-$(function(){
 
 var DrawLots = {};
 
@@ -40,15 +39,7 @@ DrawLots.EntrantListView = Backbone.View.extend({
     className: 'drawing-lots',
     template: _.template($('#drawing-lots-template').html()),
 
-    events: {
-        /* "keypress #new-entrant": "createOnEnter" */
-        "submit #new-entry": "createOnSubmit"
-    },
-
     initialize: function() {
-        this.input = this.$("#new-entry-name");
-        this.listenTo(DrawLots.entrants, 'add', this.addOne);
-        this.listenTo(DrawLots.entrants, 'reset', this.addAll);
         DrawLots.entrants.fetch();
     },
 
@@ -56,23 +47,6 @@ DrawLots.EntrantListView = Backbone.View.extend({
         this.$el.html(this.template({}));
         return this;
     },
-
-    addOne: function(entrant) {
-        var view = new DrawLots.EntrantView({model: entrant});
-        this.$("#entries").append(view.render().el);
-    },
-
-    addAll: function() {
-        DrawLots.entrants.each(this.addOne, this);
-    },
-
-    createOnSubmit: function() {
-        if (e.keyCode != 13) return;
-        if (!this.input.val()) return;
-
-        DrawLots.entrants.create({title: this.input.val()});
-        this.input.val('');
-    }
 
 });
 
@@ -95,9 +69,9 @@ DrawLots.Router = Backbone.Router.extend({
     }
 });
 
+$(function(){
 
     DrawLots.router = new DrawLots.Router();
     Backbone.history.start();
-/* }); */
 
 });
