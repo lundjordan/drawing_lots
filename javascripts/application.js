@@ -1,5 +1,5 @@
-$(function(){
 
+$(function(){
     var DrawLots = DrawLots || {}; // create a global object for a namespace
 
     // Models
@@ -63,38 +63,57 @@ $(function(){
 
         events: {
             "submit #new-entry": "createOnSubmit"
+            // call createOnSubmit when the form with new-entry ID is submitted
         },
 
         initialize: function() {
-            this.input = this.$("#new-entry-name");
             this.listenTo(DrawLots.entrants, 'add', this.addOne);
             this.listenTo(DrawLots.entrants, 'reset', this.addAll);
+            /* this.listenTo(DrawLots.entrants, 'all', this.render); */
+            // attach this view to the entrants collection and sign this view up
+            // for 'add' and 'reset' changes. addOne and addAll will be called
+            // respectively on the evnt
             DrawLots.entrants.fetch();
-            // fetch says to grab  all the entrants from the collection
+            // fetch says to grab  all the entrants from the DB and add it to
+            // collection
             // in this case, this is from the browsers localStorage
         },
 
         render: function() { // just the same as the single entrant View but I am not passing 
                             // any params as I have no <%= %> tags needed to be filled
             this.$el.html(this.template({}));
+            this.addAll(); // I am calling addAll() here to populate the <ul> entries
             return this;
         },
 
         addOne: function(entrant) {
             var view = new DrawLots.EntrantView({model: entrant});
             this.$("#entries").append(view.render().el);
+            // this method is called because of listenTo() in initialize()
+            // 1) create a new EntrantView
+            // 2) render that view and add that view into the <ul> list 
         },
 
         addAll: function() {
             DrawLots.entrants.each(this.addOne, this);
+            // this method is called because of listenTo() in initialize()
+            // for each entrant in the collection, add it to the <ul> list
+            // with addOne() function
         },
 
-        createOnSubmit: function() {
-            if (e.keyCode != 13) return;
-            if (!this.input.val()) return;
-
-            DrawLots.entrants.create({title: this.input.val()});
-            this.input.val('');
+        createOnSubmit: function(event) {
+            event.preventDefault();
+            var input = $("#new-entry-name"); //grab the textfield for value reference
+            DrawLots.entrants.create({name: input.val()});
+            input.val('');
+            // the bread and butter. XXX read every other comment first
+            // 1) called on form submit, see events: <- above
+            // 2) takes the value in the textfield and creates a new model
+            // 3) adds that model (Entrant) to the Entrants collection
+            // 4) this changes the entrants collection which fires an 'add'
+            // event.
+            // 5) since this view is listening to those events, the addOne()
+            // function is called and the view is updated!! -- simply beautiful
         }
 
     });
@@ -108,7 +127,7 @@ $(function(){
         },
 
         initialize: function() {
-            this.MainView = new DrawLots.EntrantListView; 
+            this.MainView = new DrawLots.EntrantListView;
             // upon this router instantiation, instantiate a EntrantsListView
         },
 
@@ -118,7 +137,6 @@ $(function(){
         }
     });
 
-        DrawLots.router = new DrawLots.Router(); // instantiate a router
-        Backbone.history.start(); // kick it all off!!
-
+    DrawLots.router = new DrawLots.Router(); // instantiate a router
+    Backbone.history.start(); // kick it all off!!
 });
