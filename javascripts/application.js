@@ -1,16 +1,21 @@
-$(function(){
     var DrawLots = DrawLots || {}; // create a global object for a namespace
 
     // Models
     // manages what an individual model looks like (its validity, behaviour, data)
     // fires events when the model's data updates
     DrawLots.Entrant = Backbone.Model.extend({
+
         defaults: function() {
             return {
                 name: '',
                 winner: false
             }
+        },
+
+        makeWinner: function() {
+            this.save({winner: true});
         }
+
     });
     /////
 
@@ -20,8 +25,12 @@ $(function(){
     // when the collection changes
     DrawLots.EntrantList = Backbone.Collection.extend({
         model: DrawLots.Entrant,
-        localStorage: new Backbone.LocalStorage("backbone-drawing-lots")
+        localStorage: new Backbone.LocalStorage("backbone-drawing-lots"),
         // using local storage so no server/backend needed
+
+        notDrawn: function () {
+            return this.where({winner: false});
+        }
 
     });
     DrawLots.entrants = new DrawLots.EntrantList;
@@ -29,15 +38,19 @@ $(function(){
 
     ///// Views:
     //in charge of what content the user sees based upon the view's
-    //template and the collection/model data affliated with it. It also can attach
+    //template and the collection/model data affliated with it. It can attach
     //itself to models/collections and get notified of changes. In addition, it
     //will listen for user events (like clicking a form submit button). This can be
     //an event where the view has a chance to manipulate itself
     DrawLots.EntrantView = Backbone.View.extend({ // this view represents a single Entrant
-        tagname: "li", // here this view will be surrounded by an li tag
+        tagName: "li", // here this view will be surrounded by an li tag
         template: _.template($('#entrant-template').html()),
         // inside the li tag will be filled with the script from index.html
         // with ID as entrant-template
+
+        initialize: function() {
+            this.listenTo(this.model, 'change', this.render);
+        },
 
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -62,8 +75,9 @@ $(function(){
 
         events: {
             "keypress #new-entry-name":  "createOnEnter",
-            "submit #new-entry": "createOnSubmit"
+            "submit #new-entry": "createOnSubmit",
             // call createOnSubmit when the form with new-entry ID is submitted
+            "click #draw": "pickRandomWinner"
         },
 
         initialize: function() {
@@ -101,10 +115,21 @@ $(function(){
             // with addOne() function
         },
 
+        pickRandomWinner: function() {
+            if (DrawLots.entrants.size() == 0) {
+                alert("You must create an entrant first!");
+                return;
+            }
+            luckyEntrant = _.shuffle(DrawLots.entrants.notDrawn())[0];
+            if (!luckyEntrant) {
+                alert("Every entrant has been drawn!");
+                return;
+            }
+            luckyEntrant.makeWinner();
+        },
+
         createOnEnter: function(event) {
-            var input = $("#new-entry-name"); //grab the textfield for value reference
             if (event.keyCode != 13) return;
-            if (!input.val()) return;
             this.createEntrant();
         },
 
@@ -115,6 +140,7 @@ $(function(){
 
         createEntrant: function() {
             var input = $("#new-entry-name"); //grab the textfield for value reference
+            if (!input.val()) return;
             DrawLots.entrants.create({name: input.val()});
             input.val('');
             // the bread and butter. XXX read every other comment first
@@ -148,6 +174,7 @@ $(function(){
         }
     });
 
+$(function(){
     DrawLots.router = new DrawLots.Router(); // instantiate a router
     Backbone.history.start(); // kick it all off!!
 });

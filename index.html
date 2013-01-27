@@ -18,8 +18,11 @@
     </script>
 
     <script type="text/template" id="entrant-template">
-      <div>
-        <label><%= name %></label>
+      <div class="entrant">
+        <%= name %>
+        <% if (winner) { %>
+          <span class="winner">WINNER</span></li>
+        <% } %>
       </div>
     </script>
 
