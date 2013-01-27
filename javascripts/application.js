@@ -87,7 +87,6 @@ DrawLots.EntrantListView = Backbone.View.extend({ // this view represents the vi
     // the draw winner button, and all the entrants when they are persisted
 
     events: {
-        "keypress #new-entry-name":  "createOnEnter",
         "submit #new-entry": "createOnSubmit",
         // call createOnSubmit when the form with new-entry ID is submitted
         "click #draw": "pickRandomNotDrawnEntrant"
@@ -129,37 +128,35 @@ DrawLots.EntrantListView = Backbone.View.extend({ // this view represents the vi
     },
 
     pickRandomNotDrawnEntrant: function() {
+        this.clearWarnings();
         if (DrawLots.entrants.size() == 0) {
-            alert("You must create an entrant first!");
-            return;
+            /* alert("You must create an entrant first!"); */
+            return this.warn("#drawWarning", "You must create an entrant first!");
         }
         luckyEntrant = _.shuffle(DrawLots.entrants.notDrawn())[0];
         if (!luckyEntrant) {
-            alert("Every entrant has been drawn!");
-            return;
+            /* alert("Every entrant has been drawn!"); */
+            return this.warn("#drawWarning", "Every entrant has been drawn!");
         }
         DrawLots.entrants.resetRecentWinners();
         luckyEntrant.makeNewWinner();
     },
 
-    createOnEnter: function(event) {
-        if (event.keyCode != 13) return;
-        this.createEntrant();
-    },
-
     createOnSubmit: function(event) {
         event.preventDefault();
+        console.log('made it here');
         this.createEntrant();
     },
 
     createEntrant: function() {
+        this.clearWarnings();
         var input = $("#new-entry-name"); //grab the textfield for value reference
         if (!input.val()) {
-            alert("please provide a name for entrant");
-            return;
+            /* alert("please provide a name for entrant"); */
+            return this.warn("#newEntrantWarning", "please provide a name for entrant");
         }
         DrawLots.entrants.create({name: input.val()});
-        input.val('');
+        input.val('').focus();
         // the bread and butter. XXX read every other comment first
         // 1) called on form submit, see events: <- above
         // 2) takes the value in the textfield and creates a new model
@@ -168,6 +165,16 @@ DrawLots.EntrantListView = Backbone.View.extend({ // this view represents the vi
         // event.
         // 5) since this view is listening to those events, the addOne()
         // function is called and the view is updated!! -- simply beautiful
+    },
+
+    clearWarnings: function() {
+        $('#newEntrantWarning').hide();
+        $('#drawWarning').hide();
+    },
+
+    warn: function(warnType, message) {
+        $(warnType).html(message).fadeOut(100)
+        $(warnType).html(message).fadeIn(400)
     }
 
 });

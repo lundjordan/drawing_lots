@@ -3,18 +3,20 @@
   <head>
 
     <meta charset="utf-8">
-    <title>Drawing lots</title>
+    <title>Drawing Lots</title>
 
     <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
     <script type="text/template" id="drawing-lots-template">
       <h1>Drawing lots</h1>
       <form id="new-entry">
-        <input type="text" name="name" id="new-entry-name">
+        <input type="text" name="name" id="new-entry-name" placeholder="entrant's name...">
         <input type="submit" value="Add">
       </form>
+      <div id="newEntrantWarning" class="warning"> </div>
       <ul id="entries">
       </ul>
       <button id="draw">Draw Winner</button>
+      <div id="drawWarning" class="warning"> </div>
     </script>
 
     <script type="text/template" id="entrant-template">

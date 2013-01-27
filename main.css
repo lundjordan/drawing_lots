@@ -12,6 +12,11 @@ a {
   color: #0000FF;
 }
 
+.warning {
+    text-align: center;
+    color: red;
+}
+
 .clear {
   clear: both;
   height: 0;
