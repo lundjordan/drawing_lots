@@ -21,7 +21,7 @@
       <div class="entrant">
         <%= name %>
         <% if (winner) { %>
-          <span class="winner">WINNER</span></li>
+          <span class="winner <%= isRecentWinner ? 'highlight' : '' %>">WINNER</span></li>
         <% } %>
       </div>
     </script>
