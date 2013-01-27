@@ -1,4 +1,3 @@
-
 $(function(){
     var DrawLots = DrawLots || {}; // create a global object for a namespace
 
@@ -62,6 +61,7 @@ $(function(){
         // the draw winner button, and all the entrants when they are persisted
 
         events: {
+            "keypress #new-entry-name":  "createOnEnter",
             "submit #new-entry": "createOnSubmit"
             // call createOnSubmit when the form with new-entry ID is submitted
         },
@@ -101,8 +101,19 @@ $(function(){
             // with addOne() function
         },
 
+        createOnEnter: function(event) {
+            var input = $("#new-entry-name"); //grab the textfield for value reference
+            if (event.keyCode != 13) return;
+            if (!input.val()) return;
+            this.createEntrant();
+        },
+
         createOnSubmit: function(event) {
             event.preventDefault();
+            this.createEntrant();
+        },
+
+        createEntrant: function() {
             var input = $("#new-entry-name"); //grab the textfield for value reference
             DrawLots.entrants.create({name: input.val()});
             input.val('');
