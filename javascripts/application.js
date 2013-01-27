@@ -1,8 +1,8 @@
 var DrawLots = DrawLots || {}; // create a global object for a namespace
 
 // Models
-// manages what an individual model looks like (its validity, behaviour, data)
-// fires events when the model's data updates
+// manages what an individual model looks like (its validity, behaviour, properties)
+// fires events when the model's data is modified
 DrawLots.Entrant = Backbone.Model.extend({
 
     defaults: function() {
@@ -25,9 +25,10 @@ DrawLots.Entrant = Backbone.Model.extend({
 /////
 
 ///// Collections
-// as it sugests, manages a collection/list of individual models
-// ie, fetching model data from a DB (client or server), and firing events
-// when the collection changes
+// as it suggests, manages a collection/list of individual models
+// ie, fetching model data from a DB (client or server) andfiring events
+// when the collection changes. It also can describe functionality for the
+// collection
 DrawLots.EntrantList = Backbone.Collection.extend({
     model: DrawLots.Entrant,
     localStorage: new Backbone.LocalStorage("backbone-drawing-lots"),
@@ -50,11 +51,10 @@ DrawLots.entrants = new DrawLots.EntrantList;
 /////
 
 ///// Views:
-//in charge of what content the user sees based upon the view's
-//template and the collection/model data affliated with it. It can attach
-//itself to models/collections and get notified of changes. In addition, it
-//will listen for user events (like clicking a form submit button). This can be
-//an event where the view has a chance to manipulate itself
+//in charge of what content the user sees based upon the view's root tag(el)
+//and it's content (sometimes that content is from a script template).
+//Views are often affiliated with models/collections and get notified of changes.
+//Views can listen for user events (like clicking a form submit button).
 DrawLots.EntrantView = Backbone.View.extend({ // this view represents a single Entrant
     tagName: "li", // here this view will be surrounded by an li tag
     template: _.template($('#entrant-template').html()),
@@ -63,6 +63,8 @@ DrawLots.EntrantView = Backbone.View.extend({ // this view represents a single E
 
     initialize: function() {
         this.listenTo(this.model, 'change', this.render);
+        // listen to changes from the model that is affiliated with this View
+        // upon instantiation. Call render() when this event is fired
     },
 
     render: function() {
@@ -127,21 +129,6 @@ DrawLots.EntrantListView = Backbone.View.extend({ // this view represents the vi
         // with addOne() function
     },
 
-    pickRandomNotDrawnEntrant: function() {
-        this.clearWarnings();
-        if (DrawLots.entrants.size() == 0) {
-            /* alert("You must create an entrant first!"); */
-            return this.warn("#drawWarning", "You must create an entrant first!");
-        }
-        luckyEntrant = _.shuffle(DrawLots.entrants.notDrawn())[0];
-        if (!luckyEntrant) {
-            /* alert("Every entrant has been drawn!"); */
-            return this.warn("#drawWarning", "Every entrant has been drawn!");
-        }
-        DrawLots.entrants.resetRecentWinners();
-        luckyEntrant.makeNewWinner();
-    },
-
     createOnSubmit: function(event) {
         event.preventDefault();
         console.log('made it here');
@@ -163,14 +150,31 @@ DrawLots.EntrantListView = Backbone.View.extend({ // this view represents the vi
         // 3) adds that model (Entrant) to the Entrants collection
         // 4) this changes the entrants collection which fires an 'add'
         // event.
-        // 5) since this view is listening to those events, the addOne()
-        // function is called and the view is updated!! -- simply beautiful
+        // 5) since this view is listening to those events (see listenTo()
+        // above), the addOne() function is called and the view is updated!!
+        // -- simply beautiful!!
+    },
+
+    pickRandomNotDrawnEntrant: function() {
+        this.clearWarnings();
+        if (DrawLots.entrants.size() == 0) {
+            /* alert("You must create an entrant first!"); */
+            return this.warn("#drawWarning", "You must create an entrant first!");
+        }
+        luckyEntrant = _.shuffle(DrawLots.entrants.notDrawn())[0];
+        if (!luckyEntrant) {
+            /* alert("Every entrant has been drawn!"); */
+            return this.warn("#drawWarning", "Every entrant has been drawn!");
+        }
+        DrawLots.entrants.resetRecentWinners();
+        luckyEntrant.makeNewWinner();
     },
 
     clearWarnings: function() {
         $('#newEntrantWarning').hide();
         $('#drawWarning').hide();
     },
+
 
     warn: function(warnType, message) {
         $(warnType).html(message).fadeOut(100)
